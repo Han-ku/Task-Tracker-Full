@@ -5,6 +5,7 @@ import Register from './Register';
 import Todo from './Todo';
 import Page404 from './Page404'; 
 import PrivateRoute from '../routes/PrivateRoute.js'; 
+import PublicRoute from '../routes/PublicRoute.js'; 
 
 const Layout = () => {
     const location = useLocation(); 
@@ -24,8 +25,8 @@ const Layout = () => {
           </div>
         )}
           <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
             <Route path="/home" element={<PrivateRoute><Todo /></PrivateRoute>} />
             <Route path="*" element={<Page404 />} />
           </Routes>
