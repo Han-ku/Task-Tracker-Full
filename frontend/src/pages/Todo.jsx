@@ -17,12 +17,6 @@ const Todo = () => {
   const datePickerRef = useRef(null);
   const navigate = useNavigate();
 
-  // Проверка токена
-  const checkAuthToken = useCallback(() => {
-    const token = localStorage.getItem('token');
-    if (!token) navigate('/');
-  }, [navigate]);
-
   // Получение задач
   const fetchTodos = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -40,9 +34,8 @@ const Todo = () => {
   }, [navigate]);
 
   useEffect(() => {
-    checkAuthToken();
     fetchTodos();
-  }, [checkAuthToken, fetchTodos]);
+  }, [fetchTodos]);
 
   const handleLogout = async() => {
     localStorage.removeItem('token')

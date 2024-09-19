@@ -4,6 +4,7 @@ import Login from './Login';
 import Register from './Register';
 import Todo from './Todo';
 import Page404 from './Page404'; 
+import PrivateRoute from '../routes/PrivateRoute.js'; 
 
 const Layout = () => {
     const location = useLocation(); 
@@ -22,14 +23,12 @@ const Layout = () => {
             </p>
           </div>
         )}
-        {/* <div> */}
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/home" element={<Todo />} />
+            <Route path="/home" element={<PrivateRoute><Todo /></PrivateRoute>} />
             <Route path="*" element={<Page404 />} />
           </Routes>
-        {/* </div> */}
       </div>
     )
 }
