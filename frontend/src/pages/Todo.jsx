@@ -90,13 +90,31 @@ const Todo = () => {
   };
 
   // Обновление задачи
+  const updateTodoOnServer = async (todo) => {
+    try {
+      const response = await axios.put(`http://localhost:8081/home/${todo.todo_id}`, todo, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      return response.data.updatedTodo; 
+    } catch (error) {
+      console.error('Error updating todo:', error);
+      throw error; 
+    }
+  };
+
+  const handleEditTodoInit = (index) => {
+    setEditIndex(index); 
+    setTodoValue(todos[index].description_todo); 
+  };
+
   const handleEditTodoSave = async () => {
     if (editIndex === null) return;
+
     const newTodos = [...todos];
     const previousText = newTodos[editIndex].description_todo;
+
     if (todoValue === previousText) return;
 
-    const token = localStorage.getItem('token');
     const updatedTodo = {
       ...newTodos[editIndex],
       description_todo: todoValue,
@@ -107,12 +125,15 @@ const Todo = () => {
     };
 
     try {
-      await axios.put(`http://localhost:8081/home/${updatedTodo.todo_id}`, updatedTodo, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setTodos(newTodos);
+      const updatedTaskFromServer = await updateTodoOnServer(updatedTodo);
+  
+      setTodos((prevTodos) =>
+        prevTodos.map((todo, index) =>
+          index === editIndex ? updatedTaskFromServer : todo
+        )
+      );
     } catch (error) {
-      console.error('Error updating todo:', error);
+      console.error('Error saving the updated task:', error);
     } finally {
       setEditIndex(null);
       setTodoValue('');
@@ -120,7 +141,7 @@ const Todo = () => {
     }
   };
 
-  // Обработчик завершения задачи
+  
   const toggleTaskCompletion = async (index) => {
     const newTodos = [...todos];
     const todoId = newTodos[index]?.todo_id;
@@ -134,18 +155,7 @@ const Todo = () => {
     });
   
     setTodos(newTodos);
-  
-    try {
-      await axios.put(`http://localhost:8081/home/${todoId}`, {
-        description_todo: newTodos[index].description_todo,
-        completed: newTodos[index].completed,
-        history: newTodos[index].history,
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
-    } catch (error) {
-      console.error('Error updating task:', error);
-    }
+    await updateTodoOnServer(newTodos[index]);
   };
   
 
@@ -182,7 +192,7 @@ const Todo = () => {
         highlightedRedTodo={highlightedRedTodo}
         highlightedBlueTodo={highlightedBlueTodo}
         handleDeleteTodo={handleDeleteTodo}
-        handleEditTodoInit={setEditIndex}
+        handleEditTodoInit={handleEditTodoInit}
         toggleTaskCompletion={toggleTaskCompletion}
         isEditing={editIndex !== null}
       />

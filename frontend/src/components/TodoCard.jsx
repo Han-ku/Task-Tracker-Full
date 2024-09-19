@@ -2,15 +2,10 @@ import React, { useState } from 'react';
 import CheckButton from '../components/CheckButton';
 
 export default function TodoCard({
-  children,
-  className,
-  handleDeleteTodo,
-  index,
-  handleEditTodoInit,
-  toggleTaskCompletion,
-  todo,
-  highlightedRedTodo,
-  highlightedBlueTodo,
+  children, className, index,
+  todo,handleDeleteTodo, 
+  handleEditTodoInit, toggleTaskCompletion,
+  highlightedRedTodo, highlightedBlueTodo,
 }) {
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 

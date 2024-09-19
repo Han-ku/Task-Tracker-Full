@@ -94,23 +94,26 @@ app.post('/home', verifyToken, (req, res) => {
 // Обновление задачи
 app.put('/home/:todo_id', verifyToken, (req, res) => {
     const { todo_id } = req.params;
-    const { description_todo, completed } = req.body;
+    const { description_todo, completed, history } = req.body;
   
     if (!description_todo) return res.status(400).json({ message: 'Invalid data provided' });
-  
+    
     const sqlUpdate = `
       UPDATE user_todo
-      SET description_todo = ?, completed = ?
+      SET description_todo = ?, completed = ?, history = ?
       WHERE todo_id = ? AND user_id = ?
     `;
   
-    db.query(sqlUpdate, [description_todo, completed, todo_id, req.user.user_id], (err, result) => {
+    const historyJson = JSON.stringify(history);
+
+    db.query(sqlUpdate, [description_todo, completed, historyJson, todo_id, req.user.user_id], (err, result) => {
       if (err) return res.status(500).json({ message: 'Error updating todo' });
       if (result.affectedRows === 0) return res.status(404).json({ message: 'Todo not found' });
-      res.status(200).json({ message: 'Todo updated successfully' });
+    //   res.status(200).json({ message: 'Todo updated successfully' });
+      const updatedTodo = { todo_id, description_todo, completed, history };
+      res.status(200).json({ updatedTodo });
     });
-
-  });
+});
   
   
 
