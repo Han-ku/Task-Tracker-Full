@@ -45,6 +45,31 @@
   }
   /* END  SCROLLBAR*/
   
+  .logout {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2vh;
+  }
+
+  .logout button {
+    width: 2rem;
+    height: auto;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: .7;
+    transition: opacity .3s easy;
+  }
+
+  .logout button:hover {
+    opacity: 1;
+  }
+
+  .logout button img {
+    width: 2rem;
+    height: auto;
+  }
+
   /* START HEADER */
   header {
     display: flex;

@@ -44,6 +44,11 @@ const Todo = () => {
     fetchTodos();
   }, [checkAuthToken, fetchTodos]);
 
+  const handleLogout = async() => {
+    localStorage.removeItem('token')
+    navigate('/')
+  }
+
   // Добавление новой задачи
   const handleAddTodos = async (newTodo) => {
     if (!newTodo) return setError('Please enter a task');
@@ -164,6 +169,11 @@ const Todo = () => {
 
   return (
     <>
+      <div className='logout'>
+        <button onClick={handleLogout}>
+          <img src="/logout.png" alt="Logout" />
+        </button>
+      </div>
       <TodoInput
         handleAddTodos={handleAddTodos}
         todoValue={todoValue}
