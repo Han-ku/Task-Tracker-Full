@@ -56,8 +56,10 @@ const Todo = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      const { todo_id } = response.data;
+
       const createdTodo = {
-        ...response.data.todo,
+        todo_id,
         description_todo: newTodo,
         created_at: formattedDate,
         completed: false,
