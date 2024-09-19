@@ -6,7 +6,7 @@ const CheckButton = ({ checked, onToggle }) => {
       className={`check-button ${checked ? 'checked' : ''}`}
       onClick={onToggle}
     >
-      {checked && <div className="check-mark">&#10003;</div>}
+      {checked ? <div className="check-mark">&#10003;</div> : null}
     </div>
   );
 };
