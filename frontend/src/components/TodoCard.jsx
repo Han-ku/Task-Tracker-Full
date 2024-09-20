@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 import CheckButton from '../components/CheckButton';
+import AlertDialogSlide from '../components/AlertDialogSlide';
 
 export default function TodoCard({
   children, className, index,
-  todo,handleDeleteTodo, 
+  todo, handleDeleteTodo, 
   handleEditTodoInit, toggleTaskCompletion,
   highlightedRedTodo, highlightedBlueTodo,
 }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+
+  const handleOpenDeleteDialog = () => {
+    setIsDialogOpen(true)
+  }
+
+  const handleCloseDeleteDialog = (confirmed) => {
+    setIsDialogOpen(false)
+    if (confirmed) handleDeleteTodo(index)
+  }
 
   const toggleTooltip = () => setIsTooltipVisible(!isTooltipVisible);
 
@@ -60,10 +71,15 @@ export default function TodoCard({
         <button onClick={() => handleEditTodoInit(index)}>
           <i className="fa-solid fa-pen-to-square"></i>
         </button>
-        <button onClick={() => handleDeleteTodo(index)}>
+        
+        <button onClick={handleOpenDeleteDialog}>
           <i className="fa-regular fa-trash-can"></i>
         </button>
       </div>
+      <AlertDialogSlide
+        open={isDialogOpen}
+        onClose={handleCloseDeleteDialog} 
+      />
     </li>
   );
 }
