@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CheckButton from '../components/CheckButton';
 import AlertDialogSlide from '../components/AlertDialogSlide';
+import TooltipHistory from '../components/TooltipHistory';
 
 export default function TodoCard({
   children, className, index,
@@ -9,7 +10,6 @@ export default function TodoCard({
   highlightedRedTodo, highlightedBlueTodo,
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
   const handleOpenDeleteDialog = () => {
     setIsDialogOpen(true)
@@ -20,7 +20,7 @@ export default function TodoCard({
     if (confirmed) handleDeleteTodo(index)
   }
 
-  const toggleTooltip = () => setIsTooltipVisible(!isTooltipVisible);
+  const tooltipId = `history_tooltip_${todo.todo_id || index}`;
 
   const groupHistoryByDate = (history) =>
     history.reduce((acc, entry) => {
@@ -44,30 +44,13 @@ export default function TodoCard({
       {children}
       <div className='actionsContainer'>
         <button
-          style={{ position: 'relative' }}
-          onMouseEnter={toggleTooltip}
-          onMouseLeave={toggleTooltip}
+          data-tooltip-id={tooltipId}
         >
           <i className="fa-solid fa-info"></i>
         </button>
-        {isTooltipVisible && (
-          <div className="tooltip tooltip-visible">
-            <h2>History</h2>
-            <ul>
-              {Object.entries(groupedHistory).map(([date, entries]) => (
-                <React.Fragment key={date}>
-                  <li><strong>{date}</strong></li>
-                  {entries.map((entry, i) => (
-                    <React.Fragment key={i}>
-                      <li>{entry.action} at {entry.date.split(' ')[1]}</li>
-                      {i < entries.length - 1 && <hr />}
-                    </React.Fragment>
-                  ))}
-                </React.Fragment>
-              ))}
-            </ul>
-          </div>
-        )}
+        
+       <TooltipHistory groupedHistory={groupedHistory} tooltipId={tooltipId} />
+
         <button onClick={() => handleEditTodoInit(index)}>
           <i className="fa-solid fa-pen-to-square"></i>
         </button>
@@ -76,6 +59,7 @@ export default function TodoCard({
           <i className="fa-regular fa-trash-can"></i>
         </button>
       </div>
+
       <AlertDialogSlide
         open={isDialogOpen}
         onClose={handleCloseDeleteDialog} 
