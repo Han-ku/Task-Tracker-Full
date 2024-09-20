@@ -122,7 +122,7 @@ const Todo = () => {
       description_todo: todoValue,
       history: [
         ...newTodos[editIndex].history,
-        { action: `Edited from "${previousText}" to "${todoValue}"`, date: new Date().toISOString() },
+        { action: `Edited from "${previousText}" to "${todoValue}"`, date: new Date().toISOString().slice(0, 19).replace('T', ' ') },
       ],
     };
 
@@ -153,7 +153,7 @@ const Todo = () => {
     newTodos[index].completed = !newTodos[index].completed;
     newTodos[index].history.push({
       action: newTodos[index].completed ? 'Marked as completed' : 'Marked as not completed',
-      date: new Date().toISOString(),
+      date: new Date().toISOString().slice(0, 19).replace('T', ' '),
     });
   
     setTodos(newTodos);
