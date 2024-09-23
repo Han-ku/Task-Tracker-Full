@@ -77,6 +77,15 @@ app.get('/home', verifyToken, (req, res) => {
 });
 
 const formatDateForMySQL = (date) => {
+    if (typeof date === 'string') {
+        date = new Date(date)
+    }
+
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        console.error('Invalid date provided to formatDateForMySQL:', date)
+        return null
+    }
+
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); 
     const day = String(date.getDate()).padStart(2, '0');
@@ -130,7 +139,8 @@ app.put('/home/:todo_id', verifyToken, (req, res) => {
         }
     
         const currentTodo = results[0]
-        const updatedDueDate = due_date || currentTodo.due_date
+        const parsedDueDate = due_date ? new Date(due_date) : new Date(currentTodo.due_date)
+        const formattedDueDate = formatDateForMySQL(parsedDueDate)
         const historyJson = JSON.stringify(history)
     
         const sqlUpdate = 
@@ -140,7 +150,7 @@ app.put('/home/:todo_id', verifyToken, (req, res) => {
     
         db.query(
           sqlUpdate,
-          [description_todo, completed, updatedDueDate, historyJson, todo_id, req.user.user_id],
+          [description_todo, completed, formattedDueDate, historyJson, todo_id, req.user.user_id],
           (err, result) => {
             if (err) {
               console.error('Error updating todo:', err)
@@ -154,7 +164,7 @@ app.put('/home/:todo_id', verifyToken, (req, res) => {
               todo_id,
               description_todo,
               completed,
-              due_date: updatedDueDate, 
+              due_date: formattedDueDate, 
               history,
             }
             res.status(200).json({ updatedTodo })
