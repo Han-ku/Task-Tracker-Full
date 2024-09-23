@@ -10,9 +10,7 @@ import PublicRoute from '../routes/PublicRoute.js';
 const Layout = () => {
     const location = useLocation(); 
 
-    // Определяем класс welcome-wrapper в зависимости от текущего пути
     const welcomeClass = location.pathname === '/home' ? 'todos-wrapper' : 'welcome-wrapper';
-
 
     return (
       <div className={welcomeClass}>
@@ -24,10 +22,16 @@ const Layout = () => {
             </p>
           </div>
         )}
-          <Routes>
-            <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-            <Route path="/home" element={<PrivateRoute><Todo /></PrivateRoute>} />
+            <Routes>
+              <Route element={<PublicRoute />}>
+              <Route path="/" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
+
+            <Route element={<PrivateRoute />}>
+              <Route path="/home" element={<Todo />} />
+            </Route>
+
             <Route path="*" element={<Page404 />} />
           </Routes>
       </div>

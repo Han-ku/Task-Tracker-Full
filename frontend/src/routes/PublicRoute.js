@@ -1,14 +1,10 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 
-const PublicRoute = ({ children }) => {
+const PublicRoute = () => {
   const token = localStorage.getItem('token')
 
-  if (token) {
-    return <Navigate to="/home" />;
-  }
-
-  return children;
+  return token ? <Navigate to="/home" replace /> : <Outlet />;
 }
 
 export default PublicRoute;
