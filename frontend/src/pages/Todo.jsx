@@ -42,16 +42,33 @@ const Todo = () => {
     navigate('/')
   }
 
+  const formatDateForMySQL = (date) => {
+    if (!date) {
+      return null; 
+  }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
   // Добавление новой задачи
   const handleAddTodos = async (newTodo) => {
     if (!newTodo) return setError('Please enter a task');
     const token = localStorage.getItem('token');
-    const formattedDate = (selectedDate || new Date()).toISOString().slice(0, 19).replace('T', ' ');
+    const today = new Date()
 
+    if(selectedDate === null) today.setHours(23, 59, 59);
+
+    const formattedDate = selectedDate ? formatDateForMySQL(selectedDate) : formatDateForMySQL(today)
     try {
       const response = await axios.post('http://localhost:8081/home', {
         description_todo: newTodo,
-        created_at: formattedDate,
+        due_date: formattedDate,
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -61,11 +78,12 @@ const Todo = () => {
       const createdTodo = {
         todo_id,
         description_todo: newTodo,
-        created_at: formattedDate,
+        due_date: formattedDate,
         completed: false,
-        history: [{ action: 'Created', date: formattedDate }],
+        history: 
+          [{action: 'Created', date: formatDateForMySQL(new Date())},
+          { action: 'Complete until', date: formattedDate }],
       };
-
       setTodos((prevTodos) => [...prevTodos, createdTodo]);
       setError('');
     } catch (error) {
@@ -122,7 +140,8 @@ const Todo = () => {
       description_todo: todoValue,
       history: [
         ...newTodos[editIndex].history,
-        { action: `Edited from "${previousText}" to "${todoValue}"`, date: new Date().toISOString().slice(0, 19).replace('T', ' ') },
+        { action: `Edited from "${previousText}" to "${todoValue}"`, date: formatDateForMySQL(new Date())},
+      
       ],
     };
 
@@ -153,7 +172,7 @@ const Todo = () => {
     newTodos[index].completed = !newTodos[index].completed;
     newTodos[index].history.push({
       action: newTodos[index].completed ? 'Marked as completed' : 'Marked as not completed',
-      date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      date: formatDateForMySQL(new Date())
     });
   
     setTodos(newTodos);

@@ -76,16 +76,36 @@ app.get('/home', verifyToken, (req, res) => {
     });
 });
 
+const formatDateForMySQL = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 // Создание задачи
 app.post('/home', verifyToken, (req, res) => {
-    const { description_todo, created_at } = req.body;
-    if (!description_todo || !created_at) return res.status(400).json({ message: 'Invalid data provided' });
+    const { description_todo } = req.body
+    let {due_date} = req.body
+    if (!description_todo || !due_date) return res.status(400).json({ message: 'Invalid data provided' });
 
-    const sql = 'INSERT INTO user_todo (user_id, description_todo, completed, history, created_at) VALUES (?, ?, ?, ?, ?)';
-    const history = JSON.stringify([{ action: 'Created', date: created_at || new Date().toISOString() }]);
+    const parsedDate = new Date(due_date)
+    due_date = formatDateForMySQL(parsedDate)
+
+    const sql = 'INSERT INTO user_todo (user_id, description_todo, completed, history, due_date) VALUES (?, ?, ?, ?, ?)';
+    const history = JSON.stringify([
+        { action: 'Created', date: formatDateForMySQL(new Date()) },
+        { action: 'Complete until', date: due_date}]);
     
-    db.query(sql, [req.user.user_id, description_todo, false, history, created_at], (err, result) => {
-        if (err) return res.status(500).json({ message: 'Error creating todo' });
+    db.query(sql, [req.user.user_id, description_todo, false, history, due_date], (err, result) => {
+        if (err) {
+            console.error('Error creating todo:', err)
+            return res.status(500).json({ message: 'Error creating todo' });
+        }
         res.status(201).json({ message: 'Todo created successfully', todo_id: result.insertId });
     });
 });
