@@ -10,7 +10,6 @@ const Todo = () => {
   const [todoValue, setTodoValue] = useState('');
   const [editIndex, setEditIndex] = useState(null);
   const [error, setError] = useState('');
-  const highlightedRedTodo = useState(null);
   const [highlightedBlueTodo, setHighlightedBlueTodo] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -98,20 +97,25 @@ const Todo = () => {
   };
 
   // Удаление задачи
-  const handleDeleteTodo = async (index) => {
-    if (editIndex !== null) return setError('Cannot delete while editing');
-    const token = localStorage.getItem('token');
-    const todoToDelete = todos[index];
+  const handleDeleteTodo = async (todo_id) => {
+    if (editIndex !== null) return setError('Cannot delete while editing')
+    const token = localStorage.getItem('token')
 
+    const todoToDelete = todos.find((todo) => todo.todo_id === todo_id)
+    if (!todoToDelete) {
+      setError('Todo not found for deletion.')
+      return
+    }
     try {
       await axios.delete(`http://localhost:8081/home/${todoToDelete.todo_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTodos((prevTodos) => prevTodos.filter((_, i) => i !== index));
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo.todo_id !== todo_id))
     } catch (error) {
-      console.error('Error deleting todo:', error);
+      console.error('Error deleting todo:', error)
+      setError('Failed to delete the todo. Please try again.')
     }
-  };
+  }
 
   // Обновление задачи
   const updateTodoOnServer = async (todo) => {
@@ -249,7 +253,6 @@ const Todo = () => {
       <p className={`error ${error ? '' : 'error-hidden'}`}>{error}</p>
       <TodoList
         todos={todos}
-        highlightedRedTodo={highlightedRedTodo}
         highlightedBlueTodo={highlightedBlueTodo}
         handleDeleteTodo={handleDeleteTodo}
         handleEditTodoInit={handleEditTodoInit}

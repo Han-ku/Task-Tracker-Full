@@ -27,7 +27,7 @@ const groupTodosByDate = (todos) => {
 }
 
 export default function TodoList(props) {
-  const { todos = [], highlightedRedTodo, highlightedBlueTodo } = props;
+  const { todos = [], highlightedBlueTodo } = props;
 
   const groupedTodos = groupTodosByDate(todos)
   const today = formatDateForGrouping(new Date())
@@ -43,10 +43,8 @@ export default function TodoList(props) {
                 <TodoCard
                   {...props}
                   key={todo.todo_id}  
-                  className={todo.description_todo === highlightedRedTodo ? 'highlight_red' : ''}
                   todo={todo}
                   index={todo.todo_id}  
-                  highlightedRedTodo={highlightedRedTodo}
                   highlightedBlueTodo={highlightedBlueTodo}
                 >
                   <p>{todo.description_todo}</p>
@@ -70,10 +68,8 @@ export default function TodoList(props) {
                 <TodoCard
                   {...props}
                   key={todo.todo_id}  
-                  className={todo.description_todo === highlightedRedTodo ? 'highlight_red' : ''}
                   todo={todo}
                   index={todo.todo_id}  
-                  highlightedRedTodo={highlightedRedTodo}
                   highlightedBlueTodo={highlightedBlueTodo}
                 >
                   <p>{todo.description_todo}</p>

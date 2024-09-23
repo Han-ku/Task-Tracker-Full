@@ -7,7 +7,7 @@ export default function TodoCard({
   children, className,
   todo, handleDeleteTodo, 
   handleEditTodoInit, toggleTaskCompletion,
-  highlightedRedTodo, highlightedBlueTodo,
+  highlightedBlueTodo,
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -36,7 +36,6 @@ export default function TodoCard({
     <li
       className={`todoItem 
         ${todo.completed ? 'completed' : ''}  
-        ${todo.text === highlightedRedTodo ? 'highlight_red' : ''} 
         ${todo.todo_id === highlightedBlueTodo ? 'highlight_blue' : ''} 
         ${className}`}
     >
