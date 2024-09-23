@@ -126,45 +126,65 @@ const Todo = () => {
     }
   };
 
-  const handleEditTodoInit = (index) => {
-    setEditIndex(index); 
-    setTodoValue(todos[index].description_todo); 
-  };
+  const handleEditTodoInit = (todo_id) => {
+    const todo = todos.find((todo) => todo.todo_id === todo_id)
+
+    if (!todo) {
+      console.error('Invalid todo id:', todo_id)
+      return
+    }
+
+    setEditIndex(todo_id)
+    setTodoValue(todo.description_todo)
+  }
 
   const handleEditTodoSave = async () => {
     if (editIndex === null) return;
 
-    const newTodos = [...todos];
-    const previousText = newTodos[editIndex].description_todo;
+    const todoIndex = todos.findIndex((todo) => todo.todo_id === editIndex)
+    if (todoIndex === -1) {
+      console.error('Todo not found for editing')
+      return
+    }
 
-    if (todoValue === previousText) return;
+    const newTodos = [...todos]
+    const previousText = newTodos[todoIndex].description_todo
+    const previousDueDate = newTodos[todoIndex].due_date
+
+    const formattedDueDate = selectedDate
+      ? formatDateForMySQL(new Date(selectedDate))
+      : formatDateForMySQL(new Date(previousDueDate))
+
+    if (todoValue === previousText && !formattedDueDate) return
 
     const updatedTodo = {
-      ...newTodos[editIndex],
+      ...newTodos[todoIndex],
       description_todo: todoValue,
+      due_date: formattedDueDate,
       history: [
-        ...newTodos[editIndex].history,
+        ...newTodos[todoIndex].history,
         { action: `Edited from "${previousText}" to "${todoValue}"`, date: formatDateForMySQL(new Date())},
       
       ],
-    };
+    }
 
     try {
       const updatedTaskFromServer = await updateTodoOnServer(updatedTodo);
   
       setTodos((prevTodos) =>
-        prevTodos.map((todo, index) =>
-          index === editIndex ? updatedTaskFromServer : todo
+        prevTodos.map((todo) =>
+          todo.todo_id === editIndex ? updatedTaskFromServer : todo
         )
-      );
+      )
     } catch (error) {
-      console.error('Error saving the updated task:', error);
+      console.error('Error saving the updated task:', error)
     } finally {
-      setEditIndex(null);
-      setTodoValue('');
-      setHighlightedBlueTodo(null);
+      setEditIndex(null)
+      setTodoValue('')
+      setHighlightedBlueTodo(null)
+      setSelectedDate(null)
     }
-  };
+  }
 
   
   const toggleTaskCompletion = async (todoId) => {
