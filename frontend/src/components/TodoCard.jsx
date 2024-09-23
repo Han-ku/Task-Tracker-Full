@@ -4,7 +4,7 @@ import AlertDialogSlide from '../components/AlertDialogSlide';
 import TooltipHistory from '../components/TooltipHistory';
 
 export default function TodoCard({
-  children, className, index,
+  children, className,
   todo, handleDeleteTodo, 
   handleEditTodoInit, toggleTaskCompletion,
   highlightedRedTodo, highlightedBlueTodo,
@@ -17,10 +17,10 @@ export default function TodoCard({
 
   const handleCloseDeleteDialog = (confirmed) => {
     setIsDialogOpen(false)
-    if (confirmed) handleDeleteTodo(index)
+    if (confirmed) handleDeleteTodo(todo.todo_id)
   }
 
-  const tooltipId = `history_tooltip_${todo.todo_id || index}`;
+  const tooltipId = `history_tooltip_${todo.todo_id}`
 
   const groupHistoryByDate = (history) =>
     history.reduce((acc, entry) => {
@@ -37,10 +37,10 @@ export default function TodoCard({
       className={`todoItem 
         ${todo.completed ? 'completed' : ''}  
         ${todo.text === highlightedRedTodo ? 'highlight_red' : ''} 
-        ${index === highlightedBlueTodo ? 'highlight_blue' : ''} 
+        ${todo.todo_id === highlightedBlueTodo ? 'highlight_blue' : ''} 
         ${className}`}
     >
-      <CheckButton checked={todo.completed} onToggle={() => toggleTaskCompletion(index)} />
+      <CheckButton checked={todo.completed} onToggle={() => toggleTaskCompletion(todo.todo_id)} />
       {children}
       <div className='actionsContainer'>
         <button
@@ -51,7 +51,7 @@ export default function TodoCard({
         
        <TooltipHistory groupedHistory={groupedHistory} tooltipId={tooltipId} />
 
-        <button onClick={() => handleEditTodoInit(index)}>
+        <button onClick={() => handleEditTodoInit(todo.todo_id)}>
           <i className="fa-solid fa-pen-to-square"></i>
         </button>
         

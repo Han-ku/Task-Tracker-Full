@@ -20,7 +20,11 @@ const Todo = () => {
   // Получение задач
   const fetchTodos = useCallback(async () => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      console.error('No token found, redirecting to login...');
+      navigate('/');
+      return;
+    }
 
     try {
       const response = await axios.get('http://localhost:8081/home', {
@@ -163,21 +167,36 @@ const Todo = () => {
   };
 
   
-  const toggleTaskCompletion = async (index) => {
-    const newTodos = [...todos];
-    const todoId = newTodos[index]?.todo_id;
+  const toggleTaskCompletion = async (todoId) => {
+    if (!todoId) return console.error('Error: Missing todo_id for the task')
   
-    if (!todoId) return console.error('Error: Missing todo_id for the task');
-  
-    newTodos[index].completed = !newTodos[index].completed;
-    newTodos[index].history.push({
-      action: newTodos[index].completed ? 'Marked as completed' : 'Marked as not completed',
-      date: formatDateForMySQL(new Date())
-    });
-  
-    setTodos(newTodos);
-    await updateTodoOnServer(newTodos[index]);
-  };
+    const updatedTodos = todos.map((todo) => {
+      if (todo.todo_id === todoId) {
+        return {
+          ...todo,
+          completed: !todo.completed,
+          history: [
+            ...todo.history,
+            {
+              action: todo.completed ? 'Marked as not completed' : 'Marked as completed',
+              date: formatDateForMySQL(new Date()),
+            },
+          ],
+        };
+      }
+      return todo
+    })
+
+    setTodos(updatedTodos)
+
+    const updatedTask = updatedTodos.find((todo) => todo.todo_id === todoId)
+
+    try {
+      await updateTodoOnServer(updatedTask)
+    } catch (error) {
+      console.error('Error updating todo:', error)
+    }
+  }
   
 
   // Закрытие DatePicker при клике вне его
